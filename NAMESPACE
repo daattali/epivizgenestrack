@@ -2,4 +2,3 @@
 
 export(EpivizGenesTrack)
 export(epivizGenesTrackUI)
-export(html_dependency_genestrack)

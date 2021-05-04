@@ -1,16 +1,3 @@
-.onLoad <- function(libname, pkgname) {
-  shiny::addResourcePath("epiviz", system.file("wc", "epiviz", "lib", package = "shinywc"))
-}
-
-#' @export
-html_dependency_genestrack <- function() {
-  list(
-    shinywc::dependency_shinywc(),
-    shinywc::dependency_jqueryui(),
-    shinywc::dependency_webcomponentsjs(version = "1.1.0")
-  )
-}
-
 #' @export
 epivizGenesTrackUI <- function(
   id = NULL,
@@ -19,44 +6,31 @@ epivizGenesTrackUI <- function(
   ...
 ) {
 
-  shinywc::required_params(json_data)
-
-  params <- eval(substitute(alist(...)))
-  if (length(params) > 0) {
-    if (is.null(names(params)) || any(names(params) == "")) {
-      stop("genesTrackUI: additional parameters must be named attributes")
-    }
-  }
-
-  if (is.null(id)) {
-    id <- paste0('epiviz-genes-track-', sample(1e9, 1))
-  }
-
-  component_details <- list(
-    name = "epiviz-genes-track",
-    attributes = list("json-data", "chart-colors"),
-    events = list("dimChanged", "hover", "unHover")
+  dependencies <- list(
+    shinywc::dependency_shinywc(),
+    shinywc::dependency_jqueryui(),
+    shinywc::dependency_webcomponentsjs(version = "1.1.0")
   )
-  component_details <- jsonlite::toJSON(component_details, auto_unbox = TRUE)
 
-  component_tag <- htmltools::tagList(
-    htmltools::tag(
-      'epiviz-genes-track',
-      .noWS = c("after-begin", "before-end"),
-      varArgs = list(
-        id = id,
-        `json-data` = json_data,
-        `chart-colors` = chart_colors,
-        ...
-      )
+  params <- as.list(environment())
+  params_extra <- eval(substitute(alist(...)))
+
+  shiny::addResourcePath("epiviz", system.file("webcomponent", package = "epivizgenestrack"))
+
+  shiny::tagList(
+    shinywc::shinywc_ui(
+      tag = "epiviz-genes-track",
+      params = params,
+      params_extra = params_extra,
+      attributes = list("json-data", "chart-colors"),
+      required = list("json-data"),
+      events = list("dimChanged", "hover", "unHover"),
+      dependencies = dependencies
     ),
     htmltools::singleton(htmltools::tags$head(
-      htmltools::tags$script(sprintf("shinywc.setupComponent(%s)", component_details)),
       htmltools::tags$link(rel = "import", href = "epiviz/epiviz-components.html")
-    )),
-    htmltools::tags$script(sprintf("shinywc.registerComponent('%s', '%s')", "epiviz-genes-track", id))
+    ))
   )
-  htmltools::attachDependencies(component_tag, html_dependency_genestrack())
 }
 
 #' @export

@@ -25,7 +25,7 @@ jsondata <-
 test_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    epivizgenestrack::epivizGenesTrackUI(
+    epivizgenestrack::genes_track(
       id = ns("testtrack"),
       json_data = jsondata
     ),
@@ -77,7 +77,7 @@ test_ui <- function(id) {
 }
 
 test_server <- function(input, output, session) {
-  track <- epivizgenestrack::EpivizGenesTrack$new("testtrack")
+  track <- epivizgenestrack::genes_track_proxy("testtrack")
   
   observeEvent(input$get_attr, {
     fnx <- paste0("get_", input$get_attr_id)

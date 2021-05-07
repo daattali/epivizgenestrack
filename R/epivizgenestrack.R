@@ -1,5 +1,5 @@
 #' @export
-epivizGenesTrackUI <- function(
+genes_track <- function(
   id = NULL,
   json_data = NULL,
   chart_colors = NULL,
@@ -33,133 +33,67 @@ epivizGenesTrackUI <- function(
   )
 }
 
-#' @export
-EpivizGenesTrack <- R6::R6Class(
-  "EpivizGenesTrack",
-
-  private = list(
-    .id = NULL,
-    .id_noNS = NULL,
-    .session = NULL,
-    .attributes = list(),
-
-    set_attr = function(attr, value) {
-      private$.session$sendCustomMessage('shinywc-attr-set', list(
-        id = private$.id,
-        attr = attr,
-        value = value
-      ))
-    },
-
-    get_attr = function(attr) {
-      if (!attr %in% names(private$.attributes)) {
-        return(NULL)
-      }
-      private$.attributes[[attr]]
-    },
-
-    set_prop = function(prop, value) {
-      private$.session$sendCustomMessage('shinywc-prop-set', list(
-        id = private$.id,
-        prop = prop,
-        value = value
-      ))
-    },
-
-    get_prop = function(prop, cb) {
-      cbid_noNS <- paste0("__epiviz-genes-track-", prop, "-", sample(1e9, 1))
-      cbid <- private$.session$ns(cbid_noNS)
-      private$.session$sendCustomMessage('shinywc-prop-get', list(
-        id = private$.id,
-        prop = prop,
-        cbid = cbid
-      ))
-      shiny::observeEvent(private$.session$input[[cbid_noNS]], once = TRUE, {
-        cb(private$.session$input[[cbid_noNS]])
-      })
-    },
-
-    call_method = function(method, params = list()) {
-      private$.session$sendCustomMessage('shinywc-call-method', list(
-        id = private$.id,
-        method = method,
-        params = params
-      ))
-    }
-  ),
+Shinywc_genes_track <- R6::R6Class(
+  "Shinywc_genes_track",
+  inherit = shinywc::ShinywcProxy,
 
   public = list(
 
     initialize = function(id, session = shiny::getDefaultReactiveDomain()) {
-      if (is.null(session)) {
-        stop("EpivizGenesTrack can only be initialized in a Shiny environment")
-      }
-      private$.session <- session
-      private$.id_noNS <- id
-      private$.id <- private$.session$ns(private$.id_noNS)
-
-      private$.session$sendCustomMessage('shinywc-init-component', list(
-        id = private$.id
-      ))
-
-      shiny::observeEvent(private$.session$input[[paste0(private$.id_noNS, "_epiviz-genes-track-attr-change")]], {
-        evt <- private$.session$input[[paste0(private$.id_noNS, "_epiviz-genes-track-attr-change")]]
-        attr_name <- names(evt[1])
-        attr_val <- evt[[1]]
-        private$.attributes[[attr_name]] <- attr_val
-      })
-    },
-
-    id = function() {
-      private$.id_noNS
+      super$initialize(tag = "epiviz-genes-track", id = id, session = session)
     },
 
     event_dimChanged = function() {
-      private$.session$input[[paste0(private$.id_noNS, "_event_dimChanged")]]
+      super$listen_event("dimChanged")
     },
     event_hover = function() {
-      private$.session$input[[paste0(private$.id_noNS, "_event_hover")]]
+      super$listen_event("hover")
     },
     event_unHover = function() {
-      private$.session$input[[paste0(private$.id_noNS, "_event_unHover")]]
+      super$listen_event("unHover")
     },
 
     get_json_data = function() {
-      private$get_attr("json-data")
+      super$get_attr("json-data")
     },
     set_json_data = function(value) {
-      private$set_attr("json-data", value)
+      super$set_attr("json-data", value)
     },
     get_chart_colors = function() {
-      private$get_attr("chart-colors")
+      super$get_attr("chart-colors")
     },
     set_chart_colors = function(value) {
-      private$set_attr("chart-colors", value)
+      super$set_attr("chart-colors", value)
     },
     get_chartColors_prop = function(cb) {
-      private$get_prop("chartColors", cb)
+      super$get_prop("chartColors", cb)
     },
     set_chartColors_prop = function(value) {
-      private$set_prop("chartColors", value)
+      super$set_prop("chartColors", value)
     },
     get_chartSettings_prop = function(cb) {
-      private$get_prop("chartSettings", cb)
+      super$get_prop("chartSettings", cb)
     },
     set_chartSettings_prop = function(value) {
-      private$set_prop("chartSettings", value)
+      super$set_prop("chartSettings", value)
     },
     call_hostHovered = function() {
-      private$call_method("hostHovered")
+      super$call_method("hostHovered")
     },
     call_hostUnhovered = function() {
-      private$call_method("hostUnhovered")
+      super$call_method("hostUnhovered")
     },
     call_hover = function(data) {
-      private$call_method("hover", list(data))
+      super$call_method("hover", list(data))
     },
     call_unHover = function() {
-      private$call_method("unHover")
+      super$call_method("unHover")
     }
   )
 
 )
+
+#' @export
+genes_track_proxy <- function(id, session = shiny::getDefaultReactiveDomain()) {
+  Shinywc_genes_track$new(id = id, session = session)
+}

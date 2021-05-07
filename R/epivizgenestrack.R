@@ -53,18 +53,6 @@ Shinywc_genes_track <- R6::R6Class(
       super$listen_event("unHover")
     },
 
-    get_json_data = function() {
-      super$get_attr("json-data")
-    },
-    set_json_data = function(value) {
-      super$set_attr("json-data", value)
-    },
-    get_chart_colors = function() {
-      super$get_attr("chart-colors")
-    },
-    set_chart_colors = function(value) {
-      super$set_attr("chart-colors", value)
-    },
     get_chartColors_prop = function(cb) {
       super$get_prop("chartColors", cb)
     },
@@ -88,6 +76,17 @@ Shinywc_genes_track <- R6::R6Class(
     },
     call_unHover = function() {
       super$call_method("unHover")
+    }
+  ),
+
+  active = list(
+    json_data = function(value) {
+      if (missing(value)) super$get_attr("json-data")
+      else super$set_attr("json-data", value)
+    },
+    chart_colors = function(value) {
+      if (missing(value)) super$get_attr("chart-colors")
+      else super$set_attr("chart-colors", value)
     }
   )
 

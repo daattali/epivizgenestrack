@@ -80,14 +80,12 @@ test_server <- function(input, output, session) {
   track <- epivizgenestrack::genes_track_proxy("testtrack")
   
   observeEvent(input$get_attr, {
-    fnx <- paste0("get_", input$get_attr_id)
-    val <- track[[fnx]]()
+    val <- track[[input$get_attr_id]]
     shinyalert::shinyalert(text = val)
   })
   
   observeEvent(input$set_attr, {
-    fnx <- paste0("set_", input$set_attr_id)
-    track[[fnx]](input$set_attr_val)
+    track[[input$get_attr_id]] <- input$set_attr_val
   })
   
   observeEvent(input$get_prop, {
